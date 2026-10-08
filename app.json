@@ -12,6 +12,10 @@
     "android": {
       "package": "com.harsh02032002.cravedashpartner"
     },
+    "splash": {
+      "backgroundColor": "#7C3AED",
+      "resizeMode": "contain"
+    },
     "web": {}
   }
 }
