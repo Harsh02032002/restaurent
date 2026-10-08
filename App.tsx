@@ -36,21 +36,26 @@ import {
   ShieldCheck,
   Percent,
 } from 'lucide-react-native';
+import { DashboardHeader, RestaurantStatusCard, StatsCards, QuickActions, LiveOrders, KitchenSummary, AlertsSection, PerformanceSummary } from './src/components/DashboardComponents';
+import { OrdersScreen } from './src/components/OrdersScreenComponents';
+import { MenuScreen } from './src/components/MenuScreenComponents';
+import { OffersScreen } from './src/components/OffersScreenComponents';
+import { AnalyticsScreen } from './src/components/AnalyticsScreenComponents';
 
 const COLORS = {
-  primary: '#7C3AED', // Royal Purple for Restaurant Partner
-  primaryLight: '#F3E8FF',
-  accent: '#FF385C',
-  background: '#F8F9FA',
+  primary: '#0F766E', // Calming Teal
+  primaryLight: '#F0FDFA',
+  accent: '#0D9488',
+  background: '#F8FAFC', // Very soft slate/blue tint
   cardBackground: '#FFFFFF',
-  textPrimary: '#1F2937',
-  textSecondary: '#6B7280',
-  textMuted: '#9CA3AF',
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
+  textPrimary: '#334155', // Softer black/slate
+  textSecondary: '#64748B',
+  textMuted: '#94A3B8',
+  border: '#E2E8F0',
+  borderLight: '#F1F5F9',
   white: '#FFFFFF',
-  starYellow: '#FFB800',
-  vegGreen: '#00B562',
+  starYellow: '#F59E0B',
+  vegGreen: '#10B981',
   danger: '#EF4444',
 };
 
@@ -60,25 +65,52 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<ScreenTab>('dashboard');
   const [isOpen, setIsOpen] = useState<boolean>(true);
 
-  // Live Orders State
   const [orders, setOrders] = useState([
     {
       id: 'ORD-98421',
       customer: 'Aarav Sharma',
-      items: '1x Hyderabadi Chicken Dum Biryani, 1x Extra Raita',
+      phone: '+91 98765 43210',
+      items: '2 × Hyderabadi Chicken Dum Biryani\n1 × Extra Raita',
+      specialInstructions: 'Make it extra spicy, please add extra lemon.',
+      subtotal: 450,
+      deliveryFee: 50,
+      tax: 33,
       total: 533,
       time: '7:15 PM (5 mins ago)',
-      status: 'new', // new | preparing | ready
-      payment: 'Paid via UPI',
+      createdAt: '2026-10-08T19:15:00',
+      status: 'new', // new | preparing | ready | out_for_delivery | completed | cancelled
+      paymentMethod: 'UPI',
+      paymentStatus: 'PAID',
     },
     {
       id: 'ORD-87120',
       customer: 'Ananya Roy',
-      items: '1x Pepperoni Overload Pizza (Medium)',
+      phone: '+91 87654 32109',
+      items: '1 × Pepperoni Overload Pizza (Medium)',
+      subtotal: 390,
+      deliveryFee: 40,
+      tax: 34,
       total: 464,
       time: '7:02 PM (18 mins ago)',
+      createdAt: '2026-10-08T19:02:00',
       status: 'preparing',
-      payment: 'Paid via Card',
+      paymentMethod: 'CREDIT CARD',
+      paymentStatus: 'PAID',
+    },
+    {
+      id: 'ORD-65322',
+      customer: 'Rahul Verma',
+      phone: '+91 76543 21098',
+      items: '1 × Paneer Tikka Masala\n2 × Garlic Naan',
+      subtotal: 420,
+      deliveryFee: 50,
+      tax: 40,
+      total: 510,
+      time: '6:45 PM (35 mins ago)',
+      createdAt: '2026-10-08T18:45:00',
+      status: 'ready',
+      paymentMethod: 'UPI',
+      paymentStatus: 'PAID',
     },
   ]);
 
@@ -90,10 +122,15 @@ export default function App() {
       category: 'Biryani',
       price: 340,
       inStock: true,
-      rating: 4.9,
+      isAvailable: true,
+      isVeg: false,
       type: 'non-veg',
       desc: 'Slow cooked fragrant basmati rice with succulent chicken.',
+      description: 'Slow cooked fragrant basmati rice with succulent chicken.',
       prepTime: 20,
+      preparationTime: 20,
+      image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=300&auto=format&fit=crop',
+      addons: [],
     },
     {
       id: '2',
@@ -101,10 +138,15 @@ export default function App() {
       category: 'Biryani',
       price: 460,
       inStock: true,
-      rating: 4.8,
+      isAvailable: true,
+      isVeg: false,
       type: 'non-veg',
       desc: 'Tender baby lamb cooked in handi with saffron basmati rice.',
+      description: 'Tender baby lamb cooked in handi with saffron basmati rice.',
       prepTime: 25,
+      preparationTime: 25,
+      image: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?q=80&w=300&auto=format&fit=crop',
+      addons: [],
     },
     {
       id: '3',
@@ -112,10 +154,15 @@ export default function App() {
       category: 'Biryani',
       price: 290,
       inStock: false,
-      rating: 4.6,
+      isAvailable: false,
+      isVeg: true,
       type: 'veg',
       desc: 'Charcoal grilled cottage cheese cubes in spiced rice.',
+      description: 'Charcoal grilled cottage cheese cubes in spiced rice.',
       prepTime: 18,
+      preparationTime: 18,
+      image: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?q=80&w=300&auto=format&fit=crop',
+      addons: [],
     },
     {
       id: '4',
@@ -123,100 +170,17 @@ export default function App() {
       category: 'Starters',
       price: 320,
       inStock: true,
-      rating: 4.7,
+      isAvailable: true,
+      isVeg: false,
       type: 'non-veg',
       desc: 'Melt in mouth minced chicken kebabs.',
+      description: 'Melt in mouth minced chicken kebabs.',
       prepTime: 15,
+      preparationTime: 15,
+      image: 'https://images.unsplash.com/photo-1599487405270-20f5c1d68a98?q=80&w=300&auto=format&fit=crop',
+      addons: [],
     },
   ]);
-
-  // Add/Edit Dish Modal State
-  const [showAddModal, setShowAddModal] = useState<boolean>(false);
-  const [editingDishId, setEditingDishId] = useState<string | null>(null);
-
-  // Form Fields
-  const [dishName, setDishName] = useState('');
-  const [dishCategory, setDishCategory] = useState('Biryani');
-  const [dishPrice, setDishPrice] = useState('');
-  const [dishType, setDishType] = useState<'veg' | 'non-veg'>('veg');
-  const [dishDesc, setDishDesc] = useState('');
-  const [dishPrepTime, setDishPrepTime] = useState('15');
-
-  const categories = ['Starters', 'Main Course', 'Biryani', 'Pizza', 'Burgers', 'Desserts', 'Beverages'];
-
-  const openAddDishModal = (dish?: any) => {
-    if (dish) {
-      setEditingDishId(dish.id);
-      setDishName(dish.name);
-      setDishCategory(dish.category);
-      setDishPrice(dish.price.toString());
-      setDishType(dish.type || 'veg');
-      setDishDesc(dish.desc || '');
-      setDishPrepTime((dish.prepTime || 15).toString());
-    } else {
-      setEditingDishId(null);
-      setDishName('');
-      setDishCategory('Biryani');
-      setDishPrice('');
-      setDishType('veg');
-      setDishDesc('');
-      setDishPrepTime('15');
-    }
-    setShowAddModal(true);
-  };
-
-  const handleSaveDish = () => {
-    if (!dishName || !dishPrice) {
-      alert('Please enter Dish Name and Price');
-      return;
-    }
-
-    const numericPrice = parseFloat(dishPrice) || 0;
-    const numericPrepTime = parseInt(dishPrepTime, 10) || 15;
-
-    if (editingDishId) {
-      setMenuItems((prev) =>
-        prev.map((item) =>
-          item.id === editingDishId
-            ? {
-                ...item,
-                name: dishName,
-                category: dishCategory,
-                price: numericPrice,
-                type: dishType,
-                desc: dishDesc,
-                prepTime: numericPrepTime,
-              }
-            : item
-        )
-      );
-    } else {
-      const newItem = {
-        id: `dish-${Date.now()}`,
-        name: dishName,
-        category: dishCategory,
-        price: numericPrice,
-        inStock: true,
-        rating: 5.0,
-        type: dishType,
-        desc: dishDesc,
-        prepTime: numericPrepTime,
-      };
-      setMenuItems((prev) => [newItem, ...prev]);
-    }
-
-    setShowAddModal(false);
-  };
-
-  const handleDeleteDish = (id: string) => {
-    setMenuItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const toggleItemStock = (id: string) => {
-    setMenuItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, inStock: !item.inStock } : item))
-    );
-  };
 
   const updateOrderStatus = (id: string, nextStatus: string) => {
     setOrders((prev) =>
@@ -229,353 +193,40 @@ export default function App() {
       <SafeAreaView style={styles.container}>
         <StatusBar style="dark" backgroundColor="#FFFFFF" />
 
-        {/* Top Header */}
-        <View style={styles.topHeader}>
-          <View style={styles.brandGroup}>
-            <View style={styles.logoCircle}>
-              <Store size={20} color={COLORS.white} />
-            </View>
-            <View>
-              <Text style={styles.brandName}>The Royal Biryani House</Text>
-              <Text style={styles.brandSub}>CraveDash Partner Portal</Text>
-            </View>
-          </View>
-
-          <View style={styles.storeToggleGroup}>
-            <Text style={[styles.storeStatusText, isOpen ? styles.txtOpen : styles.txtClosed]}>
-              {isOpen ? 'STORE OPEN' : 'CLOSED'}
-            </Text>
-            <Switch
-              value={isOpen}
-              onValueChange={setIsOpen}
-              trackColor={{ false: COLORS.border, true: COLORS.primaryLight }}
-              thumbColor={isOpen ? COLORS.primary : COLORS.textMuted}
-            />
-          </View>
-        </View>
+        <DashboardHeader isOpen={isOpen} setIsOpen={setIsOpen} />
 
         {/* Screen Body */}
         <View style={styles.screenBody}>
           {activeTab === 'dashboard' && (
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollPadding}>
-              {/* Store Status Banner */}
-              <View style={[styles.banner, isOpen ? styles.bgOpen : styles.bgClosed]}>
-                <View style={styles.bannerDot} />
-                <Text style={styles.bannerTxt}>
-                  {isOpen ? 'Store is Open & Accepting Online Orders' : 'Store is Closed for Orders'}
-                </Text>
-              </View>
-
-              {/* Revenue Card */}
-              <View style={styles.revenueCard}>
-                <Text style={styles.revLbl}>TODAY'S REVENUE</Text>
-                <Text style={styles.revVal}>₹18,450</Text>
-                <Text style={styles.revSub}>+14.2% higher than yesterday</Text>
-
-                <View style={styles.grid4}>
-                  <View style={styles.gridItem}>
-                    <Text style={styles.gridVal}>124</Text>
-                    <Text style={styles.gridLbl}>Total Orders</Text>
-                  </View>
-                  <View style={styles.gridItem}>
-                    <Text style={[styles.gridVal, { color: COLORS.accent }]}>8</Text>
-                    <Text style={styles.gridLbl}>Pending</Text>
-                  </View>
-                  <View style={styles.gridItem}>
-                    <Text style={[styles.gridVal, { color: COLORS.vegGreen }]}>110</Text>
-                    <Text style={styles.gridLbl}>Completed</Text>
-                  </View>
-                  <View style={styles.gridItem}>
-                    <Text style={[styles.gridVal, { color: COLORS.danger }]}>6</Text>
-                    <Text style={styles.gridLbl}>Cancelled</Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* Quick Actions */}
-              <View style={styles.quickGrid}>
-                <TouchableOpacity style={styles.quickBtn} onPress={() => setActiveTab('orders')}>
-                  <ShoppingBag size={20} color={COLORS.primary} />
-                  <Text style={styles.quickTxt}>Kitchen Orders (8)</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.quickBtn} onPress={() => setActiveTab('menu')}>
-                  <Store size={20} color={COLORS.primary} />
-                  <Text style={styles.quickTxt}>Menu Manager ({menuItems.length})</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Live Kitchen Orders */}
-              <Text style={styles.sectionHeading}>Live Kitchen Orders (KDS)</Text>
-              {orders.map((ord) => (
-                <View key={ord.id} style={styles.orderCard}>
-                  <View style={styles.ordHead}>
-                    <Text style={styles.ordId}>{ord.id} • {ord.customer}</Text>
-                    <Text style={styles.ordTime}>{ord.time}</Text>
-                  </View>
-                  <Text style={styles.ordItems}>{ord.items}</Text>
-                  <Text style={styles.ordTotal}>Total: ₹{ord.total} • {ord.payment}</Text>
-
-                  <View style={styles.ordActions}>
-                    {ord.status === 'new' && (
-                      <TouchableOpacity
-                        style={styles.actionBtnPrimary}
-                        onPress={() => updateOrderStatus(ord.id, 'preparing')}
-                      >
-                        <Check size={16} color={COLORS.white} />
-                        <Text style={styles.btnTxt}>Accept & Start Preparing</Text>
-                      </TouchableOpacity>
-                    )}
-
-                    {ord.status === 'preparing' && (
-                      <TouchableOpacity
-                        style={[styles.actionBtnPrimary, { backgroundColor: COLORS.vegGreen }]}
-                        onPress={() => updateOrderStatus(ord.id, 'ready')}
-                      >
-                        <CheckCircle2 size={16} color={COLORS.white} />
-                        <Text style={styles.btnTxt}>Mark as Ready for Pickup</Text>
-                      </TouchableOpacity>
-                    )}
-
-                    {ord.status === 'ready' && (
-                      <View style={styles.readyBadge}>
-                        <CheckCircle2 size={16} color={COLORS.vegGreen} />
-                        <Text style={styles.readyTxt}>Ready! Waiting for Delivery Driver</Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-              ))}
+              <RestaurantStatusCard isOpen={isOpen} setIsOpen={setIsOpen} />
+              <StatsCards />
+              <QuickActions setActiveTab={setActiveTab} />
+              <KitchenSummary orders={orders} setActiveTab={setActiveTab} />
+              <AlertsSection menuItems={menuItems} orders={orders} />
+              <PerformanceSummary />
+              <LiveOrders orders={orders} updateOrderStatus={updateOrderStatus} />
             </ScrollView>
           )}
 
           {activeTab === 'orders' && (
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollPadding}>
-              <Text style={styles.pageTitle}>Kitchen Order System (KDS)</Text>
-              {orders.map((ord) => (
-                <View key={ord.id} style={styles.orderCard}>
-                  <Text style={styles.ordId}>{ord.id} • {ord.customer}</Text>
-                  <Text style={styles.ordItems}>{ord.items}</Text>
-                  <Text style={styles.ordTotal}>Total: ₹{ord.total}</Text>
-                </View>
-              ))}
-            </ScrollView>
+            <OrdersScreen orders={orders} updateOrderStatus={updateOrderStatus} isOpen={isOpen} />
           )}
 
           {activeTab === 'menu' && (
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollPadding}>
-              <View style={styles.pageHeadRow}>
-                <View>
-                  <Text style={styles.pageTitle}>Menu & Stock Manager</Text>
-                  <Text style={styles.pageSubTitle}>{menuItems.length} dishes in menu</Text>
-                </View>
-                <TouchableOpacity style={styles.addDishBtn} onPress={() => openAddDishModal()}>
-                  <Plus size={16} color={COLORS.white} />
-                  <Text style={styles.addDishTxt}>+ Add New Dish</Text>
-                </TouchableOpacity>
-              </View>
-
-              {menuItems.map((item) => (
-                <View key={item.id} style={styles.menuRow}>
-                  <View style={{ flex: 1, paddingRight: 8 }}>
-                    <View style={styles.itemTitleRow}>
-                      <View
-                        style={[
-                          styles.vegBox,
-                          { borderColor: item.type === 'veg' ? COLORS.vegGreen : COLORS.danger },
-                        ]}
-                      >
-                        <View
-                          style={[
-                            styles.vegDot,
-                            { backgroundColor: item.type === 'veg' ? COLORS.vegGreen : COLORS.danger },
-                          ]}
-                        />
-                      </View>
-                      <Text style={styles.itemName}>{item.name}</Text>
-                    </View>
-
-                    <Text style={styles.itemCat}>{item.category} • ₹{item.price} • {item.prepTime || 15} mins prep</Text>
-                    {item.desc ? <Text style={styles.itemDesc}>{item.desc}</Text> : null}
-
-                    {/* Action buttons */}
-                    <View style={styles.itemActionGroup}>
-                      <TouchableOpacity
-                        style={styles.editBtn}
-                        onPress={() => openAddDishModal(item)}
-                      >
-                        <Edit2 size={12} color={COLORS.primary} />
-                        <Text style={styles.editTxt}>Edit</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={styles.deleteBtn}
-                        onPress={() => handleDeleteDish(item.id)}
-                      >
-                        <Trash2 size={12} color={COLORS.danger} />
-                        <Text style={styles.deleteTxt}>Delete</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  <View style={styles.stockToggle}>
-                    <Text style={[styles.stockTxt, item.inStock ? styles.txtInStock : styles.txtOutStock]}>
-                      {item.inStock ? 'In Stock' : 'Out of Stock'}
-                    </Text>
-                    <Switch
-                      value={item.inStock}
-                      onValueChange={() => toggleItemStock(item.id)}
-                      trackColor={{ false: COLORS.border, true: '#D1FAE5' }}
-                      thumbColor={item.inStock ? COLORS.vegGreen : COLORS.danger}
-                    />
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
+            <MenuScreen menuItems={menuItems} setMenuItems={setMenuItems} />
           )}
 
           {activeTab === 'offers' && (
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollPadding}>
-              <Text style={styles.pageTitle}>Promo Coupons & Discounts</Text>
-
-              <View style={styles.offerCard}>
-                <View style={styles.codeRow}>
-                  <Text style={styles.codeTxt}>FIRST50</Text>
-                  <Text style={styles.activeBadge}>ACTIVE</Text>
-                </View>
-                <Text style={styles.offerHead}>50% OFF on First Order</Text>
-                <Text style={styles.offerDesc}>Min Order ₹199 • Max Discount ₹120</Text>
-              </View>
-
-              <View style={styles.offerCard}>
-                <View style={styles.codeRow}>
-                  <Text style={styles.codeTxt}>WELCOME100</Text>
-                  <Text style={styles.activeBadge}>ACTIVE</Text>
-                </View>
-                <Text style={styles.offerHead}>Flat ₹100 Discount</Text>
-                <Text style={styles.offerDesc}>Min Order ₹399</Text>
-              </View>
-            </ScrollView>
+            <OffersScreen />
           )}
 
           {activeTab === 'analytics' && (
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollPadding}>
-              <Text style={styles.pageTitle}>Performance Analytics</Text>
-
-              <View style={styles.infoCard}>
-                <Text style={styles.infoTitle}>Top Selling Dishes This Week</Text>
-                <View style={styles.rankRow}><span>1. Hyderabadi Chicken Dum Biryani</span><span style={styles.bold}>48 orders</span></View>
-                <View style={styles.rankRow}><span>2. Special Mutton Dum Biryani</span><span style={styles.bold}>32 orders</span></View>
-                <View style={styles.rankRow}><span>3. Chicken Galouti Kebab</span><span style={styles.bold}>24 orders</span></View>
-              </View>
-            </ScrollView>
+            <AnalyticsScreen />
           )}
         </View>
 
-        {/* Interactive Add / Edit Dish Modal */}
-        <Modal visible={showAddModal} animationType="slide" transparent onRequestClose={() => setShowAddModal(false)}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalCard}>
-              <View style={styles.modalHead}>
-                <Text style={styles.modalTitle}>{editingDishId ? 'Edit Menu Item' : 'Add New Menu Item'}</Text>
-                <TouchableOpacity onPress={() => setShowAddModal(false)}>
-                  <X size={20} color={COLORS.textPrimary} />
-                </TouchableOpacity>
-              </View>
 
-              <ScrollView style={styles.modalBody}>
-                {/* Food Type Selector (Veg / Non-Veg) */}
-                <Text style={styles.label}>Food Type</Text>
-                <View style={styles.typeRow}>
-                  <TouchableOpacity
-                    style={[styles.typeChip, dishType === 'veg' && styles.activeVegChip]}
-                    onPress={() => setDishType('veg')}
-                  >
-                    <View style={[styles.vegBox, { borderColor: COLORS.vegGreen }]}>
-                      <View style={[styles.vegDot, { backgroundColor: COLORS.vegGreen }]} />
-                    </View>
-                    <Text style={[styles.typeText, dishType === 'veg' && styles.activeTypeTxt]}>Pure Veg</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.typeChip, dishType === 'non-veg' && styles.activeNonVegChip]}
-                    onPress={() => setDishType('non-veg')}
-                  >
-                    <View style={[styles.vegBox, { borderColor: COLORS.danger }]}>
-                      <View style={[styles.vegDot, { backgroundColor: COLORS.danger }]} />
-                    </View>
-                    <Text style={[styles.typeText, dishType === 'non-veg' && styles.activeTypeTxt]}>Non-Veg</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Dish Name */}
-                <Text style={styles.label}>Dish Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={dishName}
-                  onChangeText={setDishName}
-                  placeholder="e.g. Paneer Butter Masala"
-                  placeholderTextColor={COLORS.textMuted}
-                />
-
-                {/* Category */}
-                <Text style={styles.label}>Category</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
-                  {categories.map((cat) => (
-                    <TouchableOpacity
-                      key={cat}
-                      style={[styles.catPill, dishCategory === cat && styles.activeCatPill]}
-                      onPress={() => setDishCategory(cat)}
-                    >
-                      <Text style={[styles.catPillTxt, dishCategory === cat && styles.activeCatPillTxt]}>
-                        {cat}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-
-                {/* Price & Prep Time Row */}
-                <View style={{ flexDirection: 'row', gap: 12 }}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.label}>Price (₹) *</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={dishPrice}
-                      onChangeText={setDishPrice}
-                      placeholder="e.g. 290"
-                      keyboardType="numeric"
-                    />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.label}>Prep Time (mins)</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={dishPrepTime}
-                      onChangeText={setDishPrepTime}
-                      placeholder="e.g. 15"
-                      keyboardType="numeric"
-                    />
-                  </View>
-                </View>
-
-                {/* Description */}
-                <Text style={styles.label}>Description</Text>
-                <TextInput
-                  style={[styles.input, { height: 70, textAlignVertical: 'top' }]}
-                  value={dishDesc}
-                  onChangeText={setDishDesc}
-                  placeholder="Enter dish description & ingredients..."
-                  multiline
-                />
-
-                {/* Submit CTA */}
-                <TouchableOpacity style={styles.saveCta} onPress={handleSaveDish} activeOpacity={0.85}>
-                  <Text style={styles.saveCtaTxt}>{editingDishId ? 'Save Changes' : '+ Add Item to Menu'}</Text>
-                </TouchableOpacity>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
 
         {/* Bottom Navigation */}
         <View style={styles.bottomNav}>
@@ -618,42 +269,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     backgroundColor: COLORS.cardBackground,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderLight,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
+    zIndex: 10,
   },
   brandGroup: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   logoCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: 12,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
   brandName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
     color: COLORS.textPrimary,
+    letterSpacing: -0.5,
   },
   brandSub: {
-    fontSize: 11,
+    fontSize: 12,
     color: COLORS.textSecondary,
+    marginTop: 2,
   },
   storeToggleGroup: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.background,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
   storeStatusText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '800',
-    marginRight: 6,
+    marginRight: 8,
   },
   txtOpen: {
     color: COLORS.primary,
@@ -665,15 +330,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollPadding: {
-    padding: 16,
-    paddingBottom: 80,
+    padding: 20,
+    paddingBottom: 100,
   },
   banner: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 16,
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 20,
   },
   bgOpen: {
     backgroundColor: COLORS.primaryLight,
@@ -686,62 +351,72 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: COLORS.primary,
-    marginRight: 8,
+    marginRight: 10,
   },
   bannerTxt: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: COLORS.textPrimary,
     flex: 1,
   },
   revenueCard: {
-    backgroundColor: '#1E293B',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 16,
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: 24,
+    padding: 24,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.04,
+    shadowRadius: 20,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: COLORS.borderLight,
   },
   revLbl: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#94A3B8',
-    letterSpacing: 1,
+    fontSize: 12,
+    fontWeight: '700',
+    color: COLORS.textSecondary,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
   revVal: {
-    fontSize: 32,
+    fontSize: 38,
     fontWeight: '900',
-    color: COLORS.white,
-    marginVertical: 4,
+    color: COLORS.textPrimary,
+    marginVertical: 8,
+    letterSpacing: -1,
   },
   revSub: {
-    fontSize: 11,
+    fontSize: 13,
     color: COLORS.vegGreen,
     fontWeight: '700',
   },
   grid4: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 16,
-    paddingTop: 16,
+    marginTop: 20,
+    paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: '#334155',
+    borderTopColor: COLORS.borderLight,
   },
   gridItem: {
     alignItems: 'center',
   },
   gridVal: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '900',
-    color: COLORS.white,
+    color: COLORS.textPrimary,
   },
   gridLbl: {
-    fontSize: 10,
-    color: '#94A3B8',
-    marginTop: 2,
+    fontSize: 11,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+    fontWeight: '600',
   },
   quickGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   quickBtn: {
     flex: 1,
@@ -749,60 +424,69 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.cardBackground,
-    paddingVertical: 14,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
-    marginHorizontal: 4,
+    paddingVertical: 16,
+    borderRadius: 20,
+    marginHorizontal: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   quickTxt: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '800',
     color: COLORS.textPrimary,
-    marginLeft: 6,
+    marginLeft: 8,
   },
   sectionHeading: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '900',
     color: COLORS.textPrimary,
-    marginBottom: 12,
+    marginBottom: 16,
+    letterSpacing: -0.5,
   },
   orderCard: {
     backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 2,
   },
   ordHead: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 10,
+    alignItems: 'center',
   },
   ordId: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '900',
     color: COLORS.textPrimary,
   },
   ordTime: {
-    fontSize: 11,
-    color: COLORS.textMuted,
-  },
-  ordItems: {
     fontSize: 12,
     color: COLORS.textSecondary,
-    lineHeight: 18,
+    fontWeight: '600',
+  },
+  ordItems: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
   },
   ordTotal: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 14,
+    fontWeight: '800',
     color: COLORS.primary,
-    marginTop: 6,
+    marginTop: 10,
   },
   ordActions: {
-    marginTop: 12,
-    paddingTop: 12,
+    marginTop: 16,
+    paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: COLORS.borderLight,
   },
@@ -811,25 +495,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 14,
+    borderRadius: 16,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
   },
   btnTxt: {
     color: COLORS.white,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '800',
-    marginLeft: 6,
+    marginLeft: 8,
   },
   readyBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ECFDF5',
-    padding: 10,
-    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
   },
   readyTxt: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
     color: COLORS.vegGreen,
     marginLeft: 6,
   },
@@ -837,115 +527,126 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   pageTitle: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 22,
+    fontWeight: '900',
     color: COLORS.textPrimary,
+    letterSpacing: -0.5,
   },
   pageSubTitle: {
-    fontSize: 11,
+    fontSize: 13,
     color: COLORS.textSecondary,
+    marginTop: 4,
   },
   addDishBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 14,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
   },
   addDishTxt: {
     color: COLORS.white,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '800',
+    marginLeft: 6,
   },
   menuRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: COLORS.cardBackground,
-    padding: 14,
-    borderRadius: 14,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    elevation: 1,
   },
   itemTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   vegBox: {
-    width: 12,
-    height: 12,
+    width: 14,
+    height: 14,
     borderWidth: 1.5,
-    borderRadius: 3,
+    borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 6,
+    marginRight: 8,
   },
   vegDot: {
-    width: 5,
-    height: 5,
+    width: 6,
+    height: 6,
     borderRadius: 3,
   },
   itemName: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '800',
     color: COLORS.textPrimary,
   },
   itemCat: {
-    fontSize: 11,
+    fontSize: 12,
     color: COLORS.textSecondary,
-    marginTop: 2,
+    marginTop: 4,
   },
   itemDesc: {
-    fontSize: 10,
+    fontSize: 11,
     color: COLORS.textMuted,
-    marginTop: 2,
+    marginTop: 4,
+    lineHeight: 16,
   },
   itemActionGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: 10,
   },
   editBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.primaryLight,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginRight: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginRight: 10,
   },
   editTxt: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '800',
     color: COLORS.primary,
-    marginLeft: 3,
+    marginLeft: 4,
   },
   deleteBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FEE2E2',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
   deleteTxt: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '800',
     color: COLORS.danger,
-    marginLeft: 3,
+    marginLeft: 4,
   },
   stockToggle: {
     alignItems: 'flex-end',
   },
   stockTxt: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   txtInStock: {
     color: COLORS.vegGreen,
@@ -955,77 +656,89 @@ const styles = StyleSheet.create({
   },
   offerCard: {
     backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 2,
   },
   codeRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    alignItems: 'center',
+    marginBottom: 10,
   },
   codeTxt: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '900',
     color: COLORS.primary,
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
   activeBadge: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
     color: COLORS.vegGreen,
     backgroundColor: '#ECFDF5',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
   offerHead: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '800',
     color: COLORS.textPrimary,
   },
   offerDesc: {
-    fontSize: 12,
+    fontSize: 13,
     color: COLORS.textSecondary,
-    marginTop: 2,
+    marginTop: 4,
   },
   infoCard: {
     backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 2,
   },
   infoTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '800',
     color: COLORS.textPrimary,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   rankRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 4,
-    fontSize: 12,
+    marginVertical: 6,
+    fontSize: 14,
   },
   bold: {
-    fontWeight: '700',
+    fontWeight: '800',
     color: COLORS.primary,
   },
   // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'flex-end',
   },
   modalCard: {
     backgroundColor: COLORS.cardBackground,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 32,
+    padding: 24,
     maxHeight: '85%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 10,
   },
   modalHead: {
     flexDirection: 'row',
@@ -1033,35 +746,35 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderBottomWidth: 1,
     borderBottomColor: COLORS.borderLight,
-    paddingBottom: 12,
-    marginBottom: 16,
+    paddingBottom: 16,
+    marginBottom: 20,
   },
   modalTitle: {
-    fontSize: 16,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '900',
     color: COLORS.textPrimary,
   },
   modalBody: {
-    maxHeight: 450,
+    maxHeight: 500,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
     color: COLORS.textSecondary,
-    marginBottom: 4,
-    marginTop: 8,
+    marginBottom: 8,
+    marginTop: 12,
   },
   typeRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 8,
+    gap: 12,
+    marginBottom: 12,
   },
   typeChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: COLORS.border,
     backgroundColor: COLORS.background,
@@ -1075,10 +788,10 @@ const styles = StyleSheet.create({
     borderColor: COLORS.danger,
   },
   typeText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 13,
+    fontWeight: '800',
     color: COLORS.textSecondary,
-    marginLeft: 6,
+    marginLeft: 8,
   },
   activeTypeTxt: {
     color: COLORS.textPrimary,
@@ -1086,29 +799,35 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: COLORS.background,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 14,
+    borderColor: COLORS.borderLight,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    fontWeight: '500',
     color: COLORS.textPrimary,
-    marginBottom: 8,
+    marginBottom: 12,
   },
   catPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 24,
     backgroundColor: COLORS.background,
     borderWidth: 1,
     borderColor: COLORS.border,
-    marginRight: 6,
+    marginRight: 8,
   },
   activeCatPill: {
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   catPillTxt: {
-    fontSize: 11,
+    fontSize: 13,
+    fontWeight: '600',
     color: COLORS.textSecondary,
   },
   activeCatPillTxt: {
@@ -1117,39 +836,54 @@ const styles = StyleSheet.create({
   },
   saveCta: {
     backgroundColor: COLORS.primary,
-    paddingVertical: 14,
-    borderRadius: 14,
+    paddingVertical: 16,
+    borderRadius: 16,
     alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 24,
+    marginTop: 24,
+    marginBottom: 32,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
   saveCtaTxt: {
     color: COLORS.white,
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '900',
   },
   bottomNav: {
     flexDirection: 'row',
-    height: 56,
+    height: 70,
     backgroundColor: COLORS.cardBackground,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.borderLight,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     alignItems: 'center',
     justifyContent: 'space-around',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 15,
+    elevation: 10,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   navTab: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
+    height: '100%',
   },
   navLbl: {
-    fontSize: 10,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
     color: COLORS.textMuted,
-    marginTop: 2,
+    marginTop: 4,
   },
   activeLbl: {
     color: COLORS.primary,
-    fontWeight: '800',
+    fontWeight: '900',
   },
 });
