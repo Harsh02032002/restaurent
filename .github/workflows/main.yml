@@ -28,15 +28,22 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Build Android project
+      - name: Make binaries executable
         run: |
           chmod +x ./node_modules/.bin/expo
+          chmod -R +x ./node_modules/react-native/sdks/hermesc/ || true
+
+      - name: Build Android project
+        run: |
           npx expo prebuild --platform android --no-install
 
       - name: Build Release APK
+        env:
+          NODE_ENV: production
         working-directory: android
         run: |
           chmod +x gradlew
+          chmod -R +x ../node_modules/react-native/sdks/hermesc/ || true
           ./gradlew assembleRelease
 
       - name: Upload APK
